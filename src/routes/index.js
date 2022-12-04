@@ -17,13 +17,13 @@ app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors());
-// app.use('/uploads',express.static('uploads'));
-const upload = multer({ dest: 'uploads/' })
+app.use('/uploads',express.static('uploads'));
+const upload = multer({ dest: './uploads' })
 // const cpUpload = upload.fields([{ name: 'image' }, { name: 'resume'}])
 const cpUpload = multer({
     storage: multer.diskStorage({
     destination:function(req,file,cb){
-        cb(null,"uploads/")
+        cb(null,"./uploads")
     },
     filename: async function(req, file, cb) {
         let id = req.body._id;
