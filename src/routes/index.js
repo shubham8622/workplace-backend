@@ -13,6 +13,11 @@ const bcrypt = require("bcryptjs");
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const multer  = require('multer')
+app.use(cookieParser())
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(cors());
+// app.use('/uploads',express.static('uploads'));
 const upload = multer({ dest: './uploads' })
 // const cpUpload = upload.fields([{ name: 'image' }, { name: 'resume'}])
 const cpUpload = multer({
@@ -36,12 +41,7 @@ const cpUpload = multer({
     })
 }).fields([{ name: 'image' }, { name: 'resume'}])
 const singleUpload = upload.single('image')
-app.use(cookieParser())
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(cors());
-app.use('/uploads',express.static('uploads'));
-app.get("/",(re,res)=>{
+app.get("/",(req,res)=>{
     res.status(200).json({
         success:true,
         message:"Hello"
