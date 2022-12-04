@@ -40,7 +40,21 @@ const cpUpload = multer({
     }
     })
 }).fields([{ name: 'image' }, { name: 'resume'}])
-const singleUpload = upload.single('image')
+const singleUpload = multer({
+    storage: multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,"./uploads")
+    },
+    filename: async function(req, file, cb) {
+        let id = req.body._id;
+        const uniqueSuffix = Date.now()+"-"+file.originalname;
+        if(file.fieldname === "image"){
+            const updateUserInfo = await User.findByIdAndUpdate({_id:id},{image:uniqueSuffix});
+            cb(null, uniqueSuffix)
+        }
+    }
+    })
+}).single('image')
 app.get("/",(req,res)=>{
     res.status(200).json({
         success:true,
@@ -224,22 +238,6 @@ app.post("/candidateData", async (req,res)=>{
 });
 app.post("/employerDetail",singleUpload,async (req,res)=>{
     try{
-        let image;
-        if(req.file !== undefined){ 
-        image = req.file.path;
-        const {company,phone_number,industry,company_size} = req.body;
-            const addUserInfo = await User.findOne({_id:req.body._id});
-            if(addUserInfo !== null){
-                const updateUserInfo = await User.findByIdAndUpdate({_id:req.body._id},{
-                    company,phone_number,industry,company_size,image
-                },{new:true});
-                res.status(200).send({
-                success:true,
-                message:"Data saved.",
-                userInfo:updateUserInfo,
-            })
-            }
-        }else{
             const {company,phone_number,industry,company_size} = req.body;
             const addUserInfo = await User.findOne({_id:req.body._id});
             if(addUserInfo !== null){
@@ -252,7 +250,6 @@ app.post("/employerDetail",singleUpload,async (req,res)=>{
                 userInfo:updateUserInfo,
             })
             }
-        }
     }catch(e){
         res.status(400).json({
             success:false,
