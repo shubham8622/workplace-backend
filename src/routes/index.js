@@ -415,9 +415,11 @@ app.post("/apply",async (req,res)=>{
         });
     }
 })
-app.get("/fetchAllapply",async (req,res)=>{
+app.post("/fetchAllapply",async (req,res)=>{
     try{
-        const data = await ApplyJobModel.find();
+        let v = jwt.verify("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzYmZiY2ExMjk5MTY5MTQzZDZjYmU0MCIsImlhdCI6MTY3MzUxMDA3OH0.NVrUTZ6Mg19hHCdy1pxyYTpNo1mykbykMULwf-I0Cbo",process.env.JWT_TOKEN)
+        // let OI = new BSON.ObjectId(v);
+        const data = await ApplyJobModel.find( {$eq: [ "$employer_id", {$toString: "$$v"}]});
         res.send({
             success:true,
             message:data
