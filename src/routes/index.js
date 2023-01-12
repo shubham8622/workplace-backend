@@ -13,6 +13,7 @@ const bcrypt = require("bcryptjs");
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const multer  = require('multer')
+const mongoose = require("mongoose");
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -418,8 +419,7 @@ app.post("/apply",async (req,res)=>{
 app.post("/fetchAllapply",async (req,res)=>{
     try{
         let v = jwt.verify(req.body.Etoken,process.env.JWT_TOKEN)
-        // let OI = new BSON.ObjectId(v);
-        const data = await ApplyJobModel.find( {$eq: [ "$employer_id", {$toString: "$$v"}]});
+        const data = await ApplyJobModel.find({employer_id:mongoose.Types.ObjectId(v.id)});
         res.send({
             success:true,
             message:data
